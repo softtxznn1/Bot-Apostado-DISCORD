@@ -1,0 +1,32 @@
+{
+  "name": "bot-salas-free-fire-discord",
+  "version": "0.3.0",
+  "private": true,
+  "type": "module",
+  "engines": { "node": ">=24 <25" },
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "check": "tsc --noEmit",
+    "test": "npm run build && node --test dist/tests/*.test.js",
+    "dev": "node --env-file-if-exists=.env --import tsx src/rooms/main.ts",
+    "start": "node --env-file-if-exists=.env dist/src/rooms/main.js",
+    "register": "node --env-file-if-exists=.env dist/src/rooms/register.js",
+    "demo": "node --import tsx src/rooms/demo.ts",
+    "demo:full": "npm run demo",
+    "doctor": "node --env-file-if-exists=.env --import tsx src/rooms/doctor.ts",
+    "emulator:doctor": "node --env-file-if-exists=.env --import tsx src/rooms/emulator-doctor.ts",
+    "verify:connections": "node --env-file-if-exists=.env --import tsx src/rooms/verify.ts",
+    "health": "node --env-file-if-exists=.env --import tsx src/rooms/healthcheck.ts",
+    "verify:local": "npm run check && npm test && npm run demo && npm run doctor",
+    "package:rooms": "npm run verify:local && node scripts/package-rooms.mjs",
+    "backup": "node --env-file-if-exists=.env dist/src/backup.js",
+    "test:rooms": "npm run build && node --test dist/tests/managed-rooms.test.js dist/tests/room-provider-v2.test.js dist/tests/room-ui.test.js dist/tests/room-delivery.test.js dist/tests/rooms-entry.test.js dist/tests/room-verification.test.js dist/tests/room-health.test.js dist/tests/room-operations.test.js dist/tests/room-android.test.js",
+    "legacy:start": "node --env-file-if-exists=.env dist/src/main.js",
+    "legacy:register": "node --env-file-if-exists=.env dist/src/register.js",
+    "legacy:demo": "node --import tsx src/demo-full.ts",
+    "legacy:web": "node --env-file-if-exists=.env dist/src/web/main.js",
+    "legacy:webhooks": "node --env-file-if-exists=.env dist/src/webhooks-main.js"
+  },
+  "dependencies": { "discord.js": "14.27.0" },
+  "devDependencies": { "@types/node": "24.10.0", "tsx": "4.23.15", "typescript": "7.0.2" }
+}

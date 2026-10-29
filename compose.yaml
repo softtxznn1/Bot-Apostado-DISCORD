@@ -1,0 +1,58 @@
+name: ff-salas
+services:
+  bot:
+    build: .
+    image: ff-salas:local
+    init: true
+    restart: unless-stopped
+    env_file: .env
+    environment:
+      DATABASE_PATH: /app/.data/rooms.sqlite
+    volumes:
+      - bot-data:/app/.data
+    read_only: true
+    tmpfs:
+      - /tmp:mode=1777,size=64m
+    cap_drop: [ALL]
+    security_opt:
+      - no-new-privileges:true
+    stop_grace_period: 30s
+
+  dashboard:
+    profiles: [legacy]
+    image: ff-salas:local
+    build: .
+    command: [node, dist/src/web/main.js]
+    init: true
+    restart: unless-stopped
+    env_file: .env
+    environment:
+      DATABASE_PATH: /app/.data/bot.sqlite
+      DASHBOARD_HOST: 0.0.0.0
+      DASHBOARD_PORT: "3000"
+      DASHBOARD_CONTAINER_BIND: "true"
+    ports:
+      - 127.0.0.1:3000:3000
+    volumes:
+      - bot-data:/app/.data
+    read_only: true
+    tmpfs:
+      - /tmp:mode=1777,size=64m
+    cap_drop: [ALL]
+    security_opt:
+      - no-new-privileges:true
+    stop_grace_period: 30s
+    healthcheck:
+      test:
+        - CMD
+        - node
+        - --input-type=module
+        - -e
+        - "try { const r = await fetch('http://127.0.0.1:3000/api/guilds', { headers: { Authorization: 'Bearer ' + process.env.DASHBOARD_TOKEN }, signal: AbortSignal.timeout(3000) }); process.exit(r.status === 200 ? 0 : 1); } catch { process.exit(1); }"
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 15s
+
+volumes:
+  bot-data:
